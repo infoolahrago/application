@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace ApiLayer.Model
+namespace Olahrago.ApiLayer.Model
 {
     public partial class OlahragoContext : DbContext
     {
@@ -17,6 +16,7 @@ namespace ApiLayer.Model
         }
 
         public virtual DbSet<Account> Account { get; set; }
+        public virtual DbSet<ApplicationMessage> ApplicationMessage { get; set; }
         public virtual DbSet<Court> Court { get; set; }
         public virtual DbSet<Owner> Owner { get; set; }
         public virtual DbSet<Playground> Playground { get; set; }
@@ -26,8 +26,8 @@ namespace ApiLayer.Model
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var connStr = "Host=localhost;Database=olahrago;Username=postgres;Password=root";
-                optionsBuilder.UseNpgsql(connStr);
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseNpgsql("Host=localhost;Database=olahrago;Username=postgres;Password=root");
             }
         }
 
@@ -43,6 +43,10 @@ namespace ApiLayer.Model
 
                 entity.Property(e => e.AccountType).HasColumnName("account_type");
 
+                entity.Property(e => e.Email)
+                    .HasColumnName("email")
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasColumnName("password")
@@ -54,6 +58,23 @@ namespace ApiLayer.Model
                     .IsRequired()
                     .HasColumnName("username")
                     .HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<ApplicationMessage>(entity =>
+            {
+                entity.ToTable("application_message");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .UseNpgsqlIdentityAlwaysColumn();
+
+                entity.Property(e => e.Key)
+                    .HasColumnName("key")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Value)
+                    .HasColumnName("value")
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<Court>(entity =>

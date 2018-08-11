@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ApiLayer.Model
+namespace Olahrago.ApiLayer.Model
 {
     public partial class Account
     {
@@ -10,6 +10,7 @@ namespace ApiLayer.Model
         public string Password { get; set; }
         public int AccountType { get; set; }
         public int Status { get; set; }
+        public string Email { get; set; }
 
         public Owner Owner { get; set; }
         public User User { get; set; }

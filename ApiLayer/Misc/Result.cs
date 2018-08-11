@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApiLayer.Misc
+namespace Olahrago.ApiLayer.Misc
 {
     public class Result
     {

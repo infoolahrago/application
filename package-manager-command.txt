@@ -1,0 +1,3 @@
+scaffold-dbcontext "Host=localhost;Database=olahrago;Username=postgres;Password=root" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir Model
+
+scaffold-dbcontext "Host=localhost;Database=olahrago;Username=postgres;Password=root" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir Model -Context OlahragoContext -Force

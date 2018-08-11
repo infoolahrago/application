@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using ApiLayer.Model.Dto;
-using ApiLayer.Business;
-using ApiLayer.Misc;
-using ApiLayer.Business.Interface;
-using ApiLayer.Business.Implementation;
+using Olahrago.ApiLayer.Model.Dto;
+using Olahrago.ApiLayer.Business;
+using Olahrago.ApiLayer.Misc;
+using Olahrago.ApiLayer.Business.Interface;
+using Olahrago.ApiLayer.Business.Implementation;
 
 namespace ApiLayer.Controllers
 {

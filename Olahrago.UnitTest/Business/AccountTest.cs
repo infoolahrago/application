@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using ApiLayer.Business.Interface;
+using Olahrago.ApiLayer.Business.Interface;
 
 namespace Olahrago.UnitTest.Business
 {
@@ -18,6 +18,12 @@ namespace Olahrago.UnitTest.Business
 
         [Fact]
         public void CreateAccount_WhenEmailExist_ReturnStatusFalse()
+        {
+
+        }
+
+        [Fact]
+        public void CreateAccount_WhenAccountCreated_ReturnStatusTrue()
         {
 
         }

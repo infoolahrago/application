@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ApiLayer.Model
+namespace Olahrago.ApiLayer.Model
 {
     public partial class Court
     {
