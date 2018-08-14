@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Olahrago.ApiLayer.Misc.Interface;
 using Olahrago.ApiLayer.Model;
+
 
 namespace Olahrago.ApiLayer.Misc
 {
-    public class Message
+    public class Message : IMessage
     {
         public string GetMessage(string key)
         {
@@ -23,8 +22,24 @@ namespace Olahrago.ApiLayer.Misc
         public string GetMessageApp(string key)
         {
             string result = string.Empty;
+            int counter = 0;
 
+            string[] keySplit = key.Split();
 
+            foreach(var item in keySplit)
+            {
+                string firstAlphabet = item.Substring(0, 1).ToUpper();
+                string nextAlphabet = item.Substring(1,item.Length -1);
+
+                if (counter != keySplit.Length)
+                {
+                    result += string.Concat(firstAlphabet, nextAlphabet, ' ');
+                }
+                else
+                {
+                    result += string.Concat(firstAlphabet, nextAlphabet);
+                }
+            }
 
             return result;
         }

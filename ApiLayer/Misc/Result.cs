@@ -12,5 +12,6 @@ namespace Olahrago.ApiLayer.Misc
             get; set;
         }
         public string Message { get; set; }
+        public Object Data {get;set;}
     }
 }

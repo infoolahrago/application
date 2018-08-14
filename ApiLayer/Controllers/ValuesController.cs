@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Olahrago.ApiLayer.Model.Dto;
 using Olahrago.ApiLayer.Business;
 using Olahrago.ApiLayer.Misc;
+using Olahrago.ApiLayer.Misc.Interface;
 using Olahrago.ApiLayer.Business.Interface;
 using Olahrago.ApiLayer.Business.Implementation;
 
@@ -16,12 +17,15 @@ namespace ApiLayer.Controllers
 
         private static Result ResultMessage = new Result();
         private static readonly IAccountLogic Account = new AccountLogic();
+        private static IMessage AppMessage { get; set; }
 
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public Result Get()
         {
-            return new string[] { "value1", "value2" };
+            ResultMessage.Data = Account.GetAccountList();
+
+            return ResultMessage;
         }
 
         // GET api/values/5
@@ -33,9 +37,22 @@ namespace ApiLayer.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task<Result> Post([FromForm]AccountDto param)
+        public Result Post([FromForm]AccountDto param)
         {
-            ResultMessage = await Account.CreateAccount(param);
+            try
+            {
+                var checkUsername = Account.CheckUsernameExist(param.Username);
+                if (!checkUsername.Status)
+                {
+                    return checkUsername;
+                }
+
+                Account.CreateAccount(param);
+            }
+            catch (Exception ex)
+            {
+                ResultMessage.Message = ex.Message;
+            }            
             
             return ResultMessage;
         }
