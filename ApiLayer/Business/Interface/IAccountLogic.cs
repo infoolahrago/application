@@ -16,10 +16,12 @@ namespace Olahrago.ApiLayer.Business.Interface
 
         Account GetAccountData(int id);
 
-        Task<Result> UpdateAccount(AccountDto detail);
+        void UpdateAccount(AccountDto detail);
 
-        Task<Result> DeleteAccount(AccountDto detail);
+        void DeleteAccount(int id);
 
         Result CheckUsernameExist(string username);
+
+        Result CheckEmailExist(string email);
     }
 }

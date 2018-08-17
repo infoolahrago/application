@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Olahrago.ApiLayer.Model.Dto;
-using Olahrago.ApiLayer.Business;
 using Olahrago.ApiLayer.Misc;
 using Olahrago.ApiLayer.Misc.Interface;
 using Olahrago.ApiLayer.Business.Interface;
-using Olahrago.ApiLayer.Business.Implementation;
 
 namespace ApiLayer.Controllers
 {
@@ -15,24 +13,44 @@ namespace ApiLayer.Controllers
     public class ValuesController : Controller
     {
 
-        private static Result ResultMessage = new Result();
-        private static readonly IAccountLogic Account = new AccountLogic();
-        private static IMessage AppMessage { get; set; }
+        public Result ResultMessage = new Result();
+        public IAccountLogic Account { get; set; }
+
+        public ValuesController(IAccountLogic account)
+        {
+            Account = account;
+        }
 
         // GET api/values
         [HttpGet]
         public Result Get()
         {
-            ResultMessage.Data = Account.GetAccountList();
-
+            try
+            {
+                ResultMessage.Data = Account.GetAccountList();
+                ResultMessage.Status = true;
+            }
+            catch (Exception ex)
+            {
+                ResultMessage.Message = ex.Message;
+            }
             return ResultMessage;
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Result Get(int id)
         {
-            return "value";
+            try
+            {
+                ResultMessage.Data = Account.GetAccountData(id);
+                ResultMessage.Status = true;
+            }
+            catch (Exception ex)
+            {
+                ResultMessage.Message = ex.Message;
+            }
+            return ResultMessage;
         }
 
         // POST api/values
@@ -41,13 +59,21 @@ namespace ApiLayer.Controllers
         {
             try
             {
-                var checkUsername = Account.CheckUsernameExist(param.Username);
-                if (!checkUsername.Status)
+                var checkUsernameExist = Account.CheckUsernameExist(param.Username);
+                var checkEmailExist = Account.CheckEmailExist(param.Email);
+
+                if (checkUsernameExist.Status)
                 {
-                    return checkUsername;
+                    return checkUsernameExist;
+                }
+
+                if (checkEmailExist.Status)
+                {
+                    return checkEmailExist;
                 }
 
                 Account.CreateAccount(param);
+                ResultMessage.Status = true;
             }
             catch (Exception ex)
             {
@@ -59,14 +85,34 @@ namespace ApiLayer.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public Result Put(int id, [FromForm]AccountDto param)
         {
+            try
+            {
+                Account.UpdateAccount(param);
+                ResultMessage.Status = true;
+            }
+            catch(Exception ex)
+            {
+                ResultMessage.Message = ex.Message;
+            }
+            return ResultMessage;
         }
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public Result Delete(int id)
         {
+            try
+            {
+                Account.DeleteAccount(id);
+                ResultMessage.Status = true;
+            }
+            catch (Exception ex)
+            {
+                ResultMessage.Message = ex.Message;
+            }
+            return ResultMessage;
         }
     }
 }

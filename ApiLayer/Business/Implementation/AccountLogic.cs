@@ -12,136 +12,82 @@ namespace Olahrago.ApiLayer.Business.Implementation
 {
     public class AccountLogic : IAccountLogic
     {
-        private static Result ResultMessage = new Result();
+        private Result ResultMessage = new Result();
 
-        private static IMessage AppMessage = new Message();
+        public IMessage AppMessage { get; set; }
 
-        private static IEncryption Encryption = new Encryption();
+        public IEncryption Encryption { get; set; }
+
+        private readonly OlahragoContext context = new OlahragoContext();
+
+        public AccountLogic(IMessage message, IEncryption encryption)
+        {
+            AppMessage = message;
+            Encryption = encryption;
+        }
 
         public IList<Account> GetAccountList()
         {
-            try
-            {
-                using (var db = new OlahragoContext())
-                {
-                    var data = (from x in db.Account select x).ToList();
+            var data = (from x in context.Account select x).ToList();
 
-                    return data;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return data;
         }
 
         public Account GetAccountData(int id)
         {
-            try
-            {
-                using (var db = new OlahragoContext())
-                {
-                    var data = (from x in db.Account select x).Where(x => x.Id.Equals(id)).FirstOrDefault();
+            var data = (from x in context.Account select x).Where(x => x.Id.Equals(id)).FirstOrDefault();
 
-                    return data;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return data;
         }
 
         public async void CreateAccount(AccountDto detail)
         {
-            using (var db = new OlahragoContext())
+            string password = Encryption.EncryptPassword(detail.Username, detail.Password);
+
+            Account account = new Account
             {
-                string password = Encryption.EncryptPassword(detail.Username, detail.Password);
+                Username = detail.Username,
+                Password = password,
+                AccountType = detail.AccountType,
+                Email = detail.Email
+            };
 
-                Account account = new Account
-                {
-                    Username = detail.Username,
-                    Password = password,
-                    AccountType = detail.AccountType,
-                    Email = detail.Email
-                };
+            await context.Account.AddAsync(account);
+            await context.SaveChangesAsync();
+        }
 
-                await db.Account.AddAsync(account);
-                await db.SaveChangesAsync();
+        public async void UpdateAccount(AccountDto detail)
+        {
+            var data = context.Account.Where(acc => acc.Id.Equals(detail.Id)).FirstOrDefault();
+
+            if (data != null)
+            {
+                data.Status = detail.Status;
+
+                await context.SaveChangesAsync();
             }
         }
 
-        public async Task<Result> UpdateAccount(AccountDto detail)
+        public async void DeleteAccount(int id)
         {
-            try
+            var data = context.Account.Where(acc => acc.Id.Equals(id)).FirstOrDefault();
+
+            if (data != null)
             {
-                using (var db = new OlahragoContext())
-                {
-                    var data = db.Account.Where(acc => acc.Id.Equals(detail.Id)).FirstOrDefault();
-                    
-                    if (data!= null)
-                    {
-                        data.Status = detail.Status;
-                    }
+                context.Account.Remove(data);
 
-                    await db.SaveChangesAsync();
-
-                    ResultMessage.Status = true;
-                    ResultMessage.Message = AppMessage.GetMessageApp("account.updated.succesfully");
-                }
+                await context.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                ResultMessage.Status = false;
-                ResultMessage.Message = ex.Message;
-            }
-            return ResultMessage;
-        }
-
-        public async Task<Result> DeleteAccount(AccountDto detail)
-        {
-            try
-            {
-                using (var db = new OlahragoContext())
-                {
-                    var data = db.Account.Where(acc => acc.Id.Equals(detail.Id)).FirstOrDefault();
-
-                    if (data != null)
-                    {
-                        db.Account.Remove(data);
-                    }
-
-                    await db.SaveChangesAsync();
-
-                    ResultMessage.Status = true;
-                    ResultMessage.Message = AppMessage.GetMessageApp("account.deleted.succesfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                ResultMessage.Status = false;
-                ResultMessage.Message = ex.Message;
-            }
-            return ResultMessage;
         }
 
         public Result CheckUsernameExist(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                ResultMessage.Message = AppMessage.GetMessageApp("username.empty");
-                return ResultMessage;
-            }
+            var checkUser = context.Account.Where(acc => acc.Username.Equals(username)).ToList();
 
-            using (var db = new OlahragoContext())
+            if (checkUser.Count > 0)
             {
-                var checkUser = db.Account.Where(acc => acc.Username.Equals(username)).ToList();
-
-                if (checkUser.Count > 0)
-                {
-                    ResultMessage.Status = true;
-                    ResultMessage.Message = AppMessage.GetMessageApp("username.exist");
-                }
+                ResultMessage.Status = true;
+                ResultMessage.Message = AppMessage.GetMessageApp("username.exist");
             }
 
             return ResultMessage;
@@ -149,21 +95,12 @@ namespace Olahrago.ApiLayer.Business.Implementation
 
         public Result CheckEmailExist(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                ResultMessage.Message = AppMessage.GetMessage("email.empty");
-                return ResultMessage;
-            }
+            var checkEmail = context.Account.Where(acc => acc.Email.Equals(email)).ToList();
 
-            using (var db = new OlahragoContext())
+            if (checkEmail.Count > 0)
             {
-                var checkEmail = db.Account.Where(acc => acc.Email.Equals(email)).ToList();
-
-                if (checkEmail.Count > 0)
-                {
-                    ResultMessage.Status = true;
-                    ResultMessage.Message = AppMessage.GetMessage("email.exist");
-                }
+                ResultMessage.Status = true;
+                ResultMessage.Message = AppMessage.GetMessageApp("email.exist");
             }
 
             return ResultMessage;

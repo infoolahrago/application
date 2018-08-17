@@ -24,14 +24,14 @@ namespace Olahrago.ApiLayer.Misc
             string result = string.Empty;
             int counter = 0;
 
-            string[] keySplit = key.Split();
+            string[] keySplit = key.Split(".");
 
             foreach(var item in keySplit)
             {
                 string firstAlphabet = item.Substring(0, 1).ToUpper();
                 string nextAlphabet = item.Substring(1,item.Length -1);
 
-                if (counter != keySplit.Length)
+                if (counter != (keySplit.Length - 1))
                 {
                     result += string.Concat(firstAlphabet, nextAlphabet, ' ');
                 }
@@ -39,6 +39,7 @@ namespace Olahrago.ApiLayer.Misc
                 {
                     result += string.Concat(firstAlphabet, nextAlphabet);
                 }
+                counter++;
             }
 
             return result;
