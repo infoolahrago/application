@@ -1,9 +1,6 @@
 ﻿using Olahrago.ApiLayer.Misc;
 using Olahrago.ApiLayer.Model.Dto;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Olahrago.ApiLayer.Model;
 
 namespace Olahrago.ApiLayer.Business.Interface

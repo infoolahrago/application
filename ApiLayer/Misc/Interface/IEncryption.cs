@@ -10,5 +10,7 @@ namespace Olahrago.ApiLayer.Misc.Interface
         string EncryptPassword(string username, string password);
 
         bool VerifyEncryption(string username, string password);
+
+        bool VerifyMd5Hash(string input, string hash);
     }
 }

@@ -11,10 +11,10 @@ namespace Olahrago.ApiLayer.Misc
         {
             string result = string.Empty;
 
-            using (var db = new OlahragoContext())
-            {
-                result = db.ApplicationMessage.Where(am => am.Key.Equals(key)).FirstOrDefault().Value;
-            }
+            //using (var db = new OlahragoContext())
+            //{
+            //    result = db.ApplicationMessage.Where(am => am.Key.Equals(key)).FirstOrDefault().Value;
+            //}
 
             return result;
         }

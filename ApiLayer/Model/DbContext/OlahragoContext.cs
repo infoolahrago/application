@@ -1,11 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Olahrago.ApiLayer.Model
 {
     public partial class OlahragoContext : DbContext
     {
+        private string connectionString;
         public OlahragoContext()
         {
         }
@@ -22,13 +24,30 @@ namespace Olahrago.ApiLayer.Model
         public virtual DbSet<Playground> Playground { get; set; }
         public virtual DbSet<User> User { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        optionsBuilder.UseNpgsql(GetConnStr());
+        //    }
+        //}
+
+        private string GetConnStr()
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseNpgsql("Host=localhost;Database=olahrago;Username=postgres;Password=root");
-            }
+            string conns = string.Empty;
+
+            string dbHost = "localhost";
+            string dbName = "olahrago";
+            string dbUsername = "postgres";
+            string dbPass = "root";
+
+            conns = $"Host={dbHost};" +
+                $"Database={dbName};" +
+                $"Username={dbUsername};" +
+                $"Password={dbPass};"
+                ;
+
+            return conns;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -7,6 +7,7 @@ using Olahrago.ApiLayer.Model.Dto;
 using Olahrago.ApiLayer.Misc;
 using Olahrago.ApiLayer.Misc.Interface;
 using Olahrago.ApiLayer.Business.Interface;
+using Microsoft.Extensions.Configuration;
 
 namespace Olahrago.ApiLayer.Business.Implementation
 {
@@ -14,16 +15,17 @@ namespace Olahrago.ApiLayer.Business.Implementation
     {
         private Result ResultMessage = new Result();
 
-        public IMessage AppMessage { get; set; }
+        public IMessage AppMessage;
 
-        public IEncryption Encryption { get; set; }
+        public IEncryption Encryption;
 
-        private readonly OlahragoContext context = new OlahragoContext();
+        private OlahragoContext context;
 
-        public AccountLogic(IMessage message, IEncryption encryption)
+        public AccountLogic(IMessage message, IEncryption encryption, OlahragoContext olahragoContext)
         {
             AppMessage = message;
             Encryption = encryption;
+            context = olahragoContext;
         }
 
         public IList<Account> GetAccountList()
@@ -40,7 +42,7 @@ namespace Olahrago.ApiLayer.Business.Implementation
             return data;
         }
 
-        public async void CreateAccount(AccountDto detail)
+        public void CreateAccount(AccountDto detail)
         {
             string password = Encryption.EncryptPassword(detail.Username, detail.Password);
 
@@ -52,11 +54,11 @@ namespace Olahrago.ApiLayer.Business.Implementation
                 Email = detail.Email
             };
 
-            await context.Account.AddAsync(account);
-            await context.SaveChangesAsync();
+            context.Account.Add(account);
+            context.SaveChanges();
         }
 
-        public async void UpdateAccount(AccountDto detail)
+        public void UpdateAccount(AccountDto detail)
         {
             var data = context.Account.Where(acc => acc.Id.Equals(detail.Id)).FirstOrDefault();
 
@@ -64,11 +66,11 @@ namespace Olahrago.ApiLayer.Business.Implementation
             {
                 data.Status = detail.Status;
 
-                await context.SaveChangesAsync();
+                context.SaveChangesAsync();
             }
         }
 
-        public async void DeleteAccount(int id)
+        public void DeleteAccount(int id)
         {
             var data = context.Account.Where(acc => acc.Id.Equals(id)).FirstOrDefault();
 
@@ -76,7 +78,7 @@ namespace Olahrago.ApiLayer.Business.Implementation
             {
                 context.Account.Remove(data);
 
-                await context.SaveChangesAsync();
+                context.SaveChangesAsync();
             }
         }
 

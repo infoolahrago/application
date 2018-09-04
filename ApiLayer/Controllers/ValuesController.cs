@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Olahrago.ApiLayer.Model.Dto;
 using Olahrago.ApiLayer.Misc;
-using Olahrago.ApiLayer.Misc.Interface;
 using Olahrago.ApiLayer.Business.Interface;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ApiLayer.Controllers
 {
@@ -23,6 +24,7 @@ namespace ApiLayer.Controllers
 
         // GET api/values
         [HttpGet]
+        [Authorize("JwtBearer")]
         public Result Get()
         {
             try

@@ -53,7 +53,7 @@ namespace Olahrago.ApiLayer.Misc
         }
 
         // Verify a hash against a string.
-        private static bool VerifyMd5Hash(string input, string hash)
+        public bool VerifyMd5Hash(string input, string hash)
         {
             // Hash the input.
             string hashOfInput = GetMd5Hash(input);
