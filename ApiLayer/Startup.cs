@@ -49,6 +49,7 @@ namespace ApiLayer
                 .AddJwtBearer();
 
             services.AddMvc();
+            services.AddCors();
 
             services.AddAuthorization(config =>
             {
