@@ -1,13 +1,11 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Olahrago.ApiLayer.Model
 {
     public partial class OlahragoContext : DbContext
     {
-        private string connectionString;
         public OlahragoContext()
         {
         }
@@ -19,36 +17,16 @@ namespace Olahrago.ApiLayer.Model
 
         public virtual DbSet<Account> Account { get; set; }
         public virtual DbSet<ApplicationMessage> ApplicationMessage { get; set; }
+        public virtual DbSet<Balance> Balance { get; set; }
         public virtual DbSet<Court> Court { get; set; }
+        public virtual DbSet<Facilities> Facilities { get; set; }
         public virtual DbSet<Owner> Owner { get; set; }
         public virtual DbSet<Playground> Playground { get; set; }
+        public virtual DbSet<PlaygroundFacilities> PlaygroundFacilities { get; set; }
+        public virtual DbSet<PlaygroundImage> PlaygroundImage { get; set; }
+        public virtual DbSet<Tokens> Tokens { get; set; }
+        public virtual DbSet<TransactionBooking> TransactionBooking { get; set; }
         public virtual DbSet<User> User { get; set; }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        optionsBuilder.UseNpgsql(GetConnStr());
-        //    }
-        //}
-
-        private string GetConnStr()
-        {
-            string conns = string.Empty;
-
-            string dbHost = "localhost";
-            string dbName = "olahrago";
-            string dbUsername = "postgres";
-            string dbPass = "root";
-
-            conns = $"Host={dbHost};" +
-                $"Database={dbName};" +
-                $"Username={dbUsername};" +
-                $"Password={dbPass};"
-                ;
-
-            return conns;
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,6 +39,12 @@ namespace Olahrago.ApiLayer.Model
                     .UseNpgsqlIdentityAlwaysColumn();
 
                 entity.Property(e => e.AccountType).HasColumnName("account_type");
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
 
                 entity.Property(e => e.Email)
                     .HasColumnName("email")
@@ -94,6 +78,27 @@ namespace Olahrago.ApiLayer.Model
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
                     .HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<Balance>(entity =>
+            {
+                entity.HasKey(e => e.AccountId);
+
+                entity.ToTable("balance");
+
+                entity.Property(e => e.AccountId)
+                    .HasColumnName("account_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Balance1).HasColumnName("balance");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.UpdatedBy)
+                    .HasColumnName("updated_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UpdatedTime).HasColumnName("updated_time");
             });
 
             modelBuilder.Entity<Court>(entity =>
@@ -134,6 +139,25 @@ namespace Olahrago.ApiLayer.Model
                 entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
             });
 
+            modelBuilder.Entity<Facilities>(entity =>
+            {
+                entity.ToTable("facilities");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasColumnName("description")
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(100);
+            });
+
             modelBuilder.Entity<Owner>(entity =>
             {
                 entity.HasKey(e => e.AccountId);
@@ -147,6 +171,12 @@ namespace Olahrago.ApiLayer.Model
                 entity.Property(e => e.Address)
                     .HasColumnName("address")
                     .HasMaxLength(150);
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
@@ -198,6 +228,12 @@ namespace Olahrago.ApiLayer.Model
                     .HasColumnName("contact")
                     .HasMaxLength(15);
 
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
+
                 entity.Property(e => e.District)
                     .IsRequired()
                     .HasColumnName("district")
@@ -224,6 +260,109 @@ namespace Olahrago.ApiLayer.Model
                     .HasMaxLength(40);
             });
 
+            modelBuilder.Entity<PlaygroundFacilities>(entity =>
+            {
+                entity.ToTable("playground_facilities");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.FacilityId).HasColumnName("facility_id");
+
+                entity.Property(e => e.PlaygroundId).HasColumnName("playground_id");
+            });
+
+            modelBuilder.Entity<PlaygroundImage>(entity =>
+            {
+                entity.ToTable("playground_image");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
+
+                entity.Property(e => e.FileName)
+                    .HasColumnName("file_name")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Path)
+                    .HasColumnName("path")
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.PlaygroundId).HasColumnName("playground_id");
+            });
+
+            modelBuilder.Entity<Tokens>(entity =>
+            {
+                entity.HasKey(e => e.AccountId);
+
+                entity.ToTable("tokens");
+
+                entity.Property(e => e.AccountId)
+                    .HasColumnName("account_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ExpiredDate).HasColumnName("expired_date");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Token)
+                    .IsRequired()
+                    .HasColumnName("token")
+                    .HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<TransactionBooking>(entity =>
+            {
+                entity.ToTable("transaction_booking");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AccountId).HasColumnName("account_id");
+
+                entity.Property(e => e.BookingDate)
+                    .HasColumnName("booking_date")
+                    .HasColumnType("date");
+
+                entity.Property(e => e.BookingNumber)
+                    .IsRequired()
+                    .HasColumnName("booking_number")
+                    .HasMaxLength(30);
+
+                entity.Property(e => e.BookingStatus).HasColumnName("booking_status");
+
+                entity.Property(e => e.BookingType).HasColumnName("booking_type");
+
+                entity.Property(e => e.CourtId).HasColumnName("court_id");
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
+
+                entity.Property(e => e.EndTime)
+                    .HasColumnName("end_time")
+                    .HasColumnType("time without time zone");
+
+                entity.Property(e => e.StartTime)
+                    .HasColumnName("start_time")
+                    .HasColumnType("time without time zone");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.AccountId);
@@ -233,6 +372,12 @@ namespace Olahrago.ApiLayer.Model
                 entity.Property(e => e.AccountId)
                     .HasColumnName("account_id")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CreatedTime).HasColumnName("created_time");
 
                 entity.Property(e => e.Email)
                     .IsRequired()

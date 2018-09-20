@@ -11,6 +11,12 @@ namespace Olahrago.ApiLayer.Model.Dto
         
     }
 
+    public class FilterModelAuth
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
     public class JwtAuth
     {
         public string SecurityKey { get; set; }

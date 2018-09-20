@@ -33,22 +33,22 @@ namespace Olahrago.ApiLayer.Controllers
         }
 
         [HttpPost("login")]
-        public Result Login([FromForm]string username, string password)
+        public Result Login([FromBody]FilterModelAuth filter)
         {
-            var checkUsername = Account.CheckUsernameExist(username);
+            var check_username = Account.CheckUsernameExist(filter.Username);
 
-            if (!checkUsername.Status)
+            if (!check_username.Status)
             {
                 ResultMessage.Status = false;
                 ResultMessage.Message = AppMessage.GetMessageApp("wrong.username.or.password");
                 return ResultMessage;
             }
 
-            var login = Auth.Login(username, password);
+            var login = Auth.Login(filter.Username, filter.Password);
 
             if (login)
             {
-                var token = Auth.GenerateToken(username);
+                var token = Auth.GenerateToken(filter.Username);
 
                 ResultMessage.Status = true;
                 ResultMessage.Message = AppMessage.GetMessageApp("login.success");

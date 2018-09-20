@@ -13,6 +13,8 @@ namespace Olahrago.ApiLayer.Model
         public int? IdentityType { get; set; }
         public int? IdentityNumber { get; set; }
         public string Address { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedTime { get; set; }
 
         public Account Account { get; set; }
     }

@@ -11,6 +11,8 @@ namespace Olahrago.ApiLayer.Model
         public int AccountType { get; set; }
         public int Status { get; set; }
         public string Email { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? CreatedTime { get; set; }
 
         public Owner Owner { get; set; }
         public User User { get; set; }
