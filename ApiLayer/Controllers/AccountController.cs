@@ -53,7 +53,7 @@ namespace Olahrago.ApiLayer.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task<Result> Post([FromForm]AccountDto param)
+        public Result Post([FromForm]AccountDto param)
         {
             try
             {

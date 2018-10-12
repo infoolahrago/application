@@ -8,5 +8,6 @@ namespace Olahrago.ApiLayer.Model.Dto
 {
     public class AccountDto : Account
     {
+        public string JwtToken { get; set; }
     }
 }

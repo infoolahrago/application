@@ -7,8 +7,6 @@ namespace Olahrago.ApiLayer.Business.Interface
 {
     public interface IAuthLogic
     {
-        bool Login(string username, string password);
-
-        string GenerateToken(string username);
+        AccountDto Login(string username, string password);
     }
 }

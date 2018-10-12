@@ -1,3 +1,5 @@
 scaffold-dbcontext "Host=localhost;Database=olahrago;Username=postgres;Password=root" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir Model
 
 scaffold-dbcontext "Host=localhost;Database=olahrago;Username=postgres;Password=root" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir Model -Context OlahragoContext -Force
+
+netsh http add urlacl url=http://*:50796/ user=everyone

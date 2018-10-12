@@ -33,9 +33,11 @@ namespace Olahrago.ApiLayer.Business.Implementation
             JwtAuthentication = jwtAuth;
         }
 
-        public bool Login(string username, string password)
+        public AccountDto Login(string username, string password)
         {
             bool isVerified = false;
+            AccountDto account = new AccountDto();
+
             var data = (from usr in Context.Account where usr.Username.Equals(username) select usr).FirstOrDefault();
 
             if (data != null)
@@ -43,25 +45,87 @@ namespace Olahrago.ApiLayer.Business.Implementation
                 isVerified = Encryption.VerifyMd5Hash(string.Concat(username, password), data.Password);
             }
 
-            return isVerified;
+            if (isVerified)
+            {
+                account.AccountType = data.AccountType;
+                account.Username = data.Username;
+                account.Id = data.Id;
+                account.JwtToken = GenerateToken(account);
+            }
+
+            return account;
         }
 
-        public string GenerateToken(string username)
+        private void SaveToken(AccountDto account, DateTime expiredDate)
         {
-            var token = new JwtSecurityToken(
-            issuer: JwtAuthentication.Value.ValidIssuer,
-            audience: JwtAuthentication.Value.ValidAudience,
-            claims: new[]
+            try
             {
-                // You can add more claims if you want
-                new Claim(JwtRegisteredClaimNames.Sub, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            },
-            expires: DateTime.UtcNow.AddDays(30),
-            notBefore: DateTime.UtcNow,
-            signingCredentials: JwtAuthentication.Value.SigningCredentials);
+                Tokens tokens = new Tokens();
 
-            var tokenData = new JwtSecurityTokenHandler().WriteToken(token);
+                tokens.AccountId = account.Id;
+                tokens.ExpiredDate = expiredDate;
+                tokens.Token = account.JwtToken;
+
+                Context.Tokens.Add(tokens);
+                Context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private Result CheckTokenExist(AccountDto account)
+        {
+            var data = (from tkn in Context.Tokens
+                        where tkn.AccountId.Equals(account.Id) && DateTime.Now <= tkn.ExpiredDate
+                        select tkn).FirstOrDefault();
+
+            if (data != null)
+            {
+                ResultMessage.Data = data.Token;
+                ResultMessage.Status = true;
+            }
+            else
+            {
+                ResultMessage.Status = false;
+            }
+
+            return ResultMessage;
+        }
+
+        private string GenerateToken(AccountDto account)
+        {
+            DateTime expired = DateTime.UtcNow.AddDays(3650);
+            string tokenData = string.Empty;
+
+            //check jwt token for each user
+            var checkTokenExist = CheckTokenExist(account);
+            if (checkTokenExist.Status)
+            {
+                tokenData = checkTokenExist.Data.ToString();
+            }
+            else
+            {
+                var token = new JwtSecurityToken(
+                    issuer: JwtAuthentication.Value.ValidIssuer,
+                    audience: JwtAuthentication.Value.ValidAudience,
+                    claims: new[]
+                    {
+                    // You can add more claims if you want
+                    new Claim(JwtRegisteredClaimNames.Sub, account.Username),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    },
+                    expires: expired,
+                    notBefore: DateTime.UtcNow,
+                    signingCredentials: JwtAuthentication.Value.SigningCredentials
+                );
+
+                tokenData = new JwtSecurityTokenHandler().WriteToken(token);
+                account.JwtToken = tokenData;
+
+                SaveToken(account, expired);
+            }
 
             return tokenData;
         }

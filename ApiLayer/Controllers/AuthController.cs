@@ -46,13 +46,11 @@ namespace Olahrago.ApiLayer.Controllers
 
             var login = Auth.Login(filter.Username, filter.Password);
 
-            if (login)
+            if (login != null)
             {
-                var token = Auth.GenerateToken(filter.Username);
-
                 ResultMessage.Status = true;
                 ResultMessage.Message = AppMessage.GetMessageApp("login.success");
-                ResultMessage.Data = token;
+                ResultMessage.Data = login.JwtToken;
             }
             else
             {
@@ -79,7 +77,7 @@ namespace Olahrago.ApiLayer.Controllers
 
                 var login = Auth.Login(username, password);
 
-                if (login)
+                if (login != null)
                 {
                     ResultMessage.Status = true;
                     ResultMessage.Message = AppMessage.GetMessageApp("login.success");

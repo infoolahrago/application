@@ -315,12 +315,15 @@ namespace Olahrago.ApiLayer.Model
 
                 entity.Property(e => e.ExpiredDate).HasColumnName("expired_date");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedOnAdd()
+                    .UseNpgsqlIdentityAlwaysColumn();
 
                 entity.Property(e => e.Token)
                     .IsRequired()
                     .HasColumnName("token")
-                    .HasMaxLength(255);
+                    .HasMaxLength(300);
             });
 
             modelBuilder.Entity<TransactionBooking>(entity =>
